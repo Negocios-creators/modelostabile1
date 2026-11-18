@@ -33,6 +33,17 @@ body.menu-aberto { overflow: hidden; }
 .ph-shade { position: absolute; inset: 0; background:
   linear-gradient(90deg, rgba(14, 12, 10, .92) 0%, rgba(14, 12, 10, .55) 45%, rgba(14, 12, 10, .2) 100%),
   linear-gradient(180deg, rgba(14, 12, 10, .55) 0%, transparent 35%, rgba(14, 12, 10, .85) 85%, var(--bg) 100%); }
+/* topo com a pessoa em destaque (Quem somos): cor quase natural do lado dele,
+   degradê grafite só do lado do texto e um halo dourado que liga a foto à paleta */
+.page-hero.destaque .ph-img img { filter: saturate(1.02) contrast(1.04) brightness(1.03); }
+.page-hero.destaque .ph-tint {
+  position: absolute; inset: 0; pointer-events: none; mix-blend-mode: soft-light;
+  background: linear-gradient(90deg, rgba(138, 90, 53, .55) 0%, rgba(201, 164, 106, .22) 55%, rgba(201, 164, 106, .08) 100%);
+}
+.page-hero.destaque .ph-shade { background:
+  radial-gradient(ellipse 34% 58% at 70% 38%, rgba(232, 210, 166, .10), transparent 70%),
+  linear-gradient(90deg, rgba(14, 12, 10, .94) 0%, rgba(14, 12, 10, .72) 30%, rgba(14, 12, 10, .2) 52%, rgba(14, 12, 10, 0) 66%, rgba(14, 12, 10, .18) 100%),
+  linear-gradient(180deg, rgba(14, 12, 10, .45) 0%, transparent 22%, transparent 72%, rgba(14, 12, 10, .85) 92%, var(--bg) 100%); }
 .ph-content { position: relative; z-index: 2; max-width: 860px; }
 .ph-content h1 { font-family: var(--font-display); font-weight: 500; font-size: clamp(42px, 6.2vw, 88px); line-height: 1.02; margin-bottom: 22px; }
 .ph-content h1 em { font-style: italic; color: var(--accent-hi); }
@@ -166,6 +177,9 @@ body.menu-aberto { overflow: hidden; }
 @media (max-width: 768px) {
   .page-hero { min-height: 82svh; padding-top: 120px; }
   .ph-shade { background: linear-gradient(180deg, rgba(14, 12, 10, .55) 0%, rgba(14, 12, 10, .3) 35%, rgba(14, 12, 10, .92) 75%, var(--bg) 100%); }
+  .page-hero.destaque .ph-shade { background:
+    radial-gradient(ellipse 60% 40% at 65% 30%, rgba(232, 210, 166, .10), transparent 70%),
+    linear-gradient(180deg, rgba(14, 12, 10, .35) 0%, transparent 18%, transparent 42%, rgba(14, 12, 10, .88) 72%, var(--bg) 100%); }
   .post-grid { grid-template-columns: 1fr; }
   .equipe-grid { gap: 22px 14px; }
   .pessoa h3 { font-size: 21px; }
