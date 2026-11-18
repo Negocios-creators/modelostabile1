@@ -31,7 +31,23 @@ Abrir `http://localhost:8080` (nunca com dois cliques / `file://`, o hero fica p
 - Depoimentos copiados palavra por palavra. Ficaram de fora avaliações de pessoas da equipe.
 - Vídeos do hero e dos depoimentos: Pexels (licença livre), ids 8061667 e 8061655, com tratamento de cor.
 
+## Páginas (desde 18/11/2026)
+
+| Página | Arquivo |
+|---|---|
+| Início | `index.html` (escrito à mão; os 3 cards do blog são preenchidos pelo gerador) |
+| Quem somos, Áreas de atuação, Contato | `quem-somos.html`, `areas-de-atuacao.html`, `contato.html` |
+| Blog + 9 artigos | `blog/index.html`, `blog/{slug}.html` |
+
+As páginas internas saem de `_gerar_paginas.py` (fora do git). Para mudar texto, equipe ou artigo, edite o script e rode `python _gerar_paginas.py`. Os artigos vêm de `_ref/antigo/artigos.json`, extraídos do blog antigo.
+
+**Formulário Fale conosco:** em `js/main.js`, `CONFIG_FORM.endpoint` está vazio. Enquanto não existir a área administrativa, o envio abre o WhatsApp do escritório com a mensagem pronta. Quando a área existir, é só colocar a URL ali: o formulário passa a enviar JSON (nome, telefone, email, assunto, mensagem, origem, enviado_em).
+
 ## Pendências com o cliente
+
+- [ ] Confirmar se a foto de atendimento do topo de Quem somos é mesmo o Dr. Henrique (ela veio do slide do site antigo)
+- [ ] Confirmar quem da equipe continua no escritório novo, e os cargos "Sócio/Sócia" (eram da sociedade antiga)
+- [ ] Ligar o formulário à área administrativa
 
 - [ ] Logo definitiva (a atual é provisória)
 - [ ] Grafia da marca: o site usa **Stabille Advogados** (pedido), mas o sobrenome registrado na OAB é **Stabile**

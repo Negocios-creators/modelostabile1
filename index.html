@@ -17,6 +17,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/paginas.css">
 <link rel="preload" as="image" href="assets/frames/hero_0001.jpg">
 
 <script type="application/ld+json">
@@ -66,13 +67,22 @@
     <img src="assets/img/logo-dourado.svg" alt="Stabille Advogados" width="196" height="53">
   </a>
   <nav>
-    <a href="#atuacao">Atuação</a>
-    <a href="#escritorio">O escritório</a>
-    <a href="#henrique">Quem atende</a>
-    <a href="#faq">Dúvidas</a>
+    <a href="quem-somos.html">Quem somos</a>
+    <a href="areas-de-atuacao.html">Áreas de atuação</a>
+    <a href="blog/">Blog</a>
+    <a href="contato.html">Contato</a>
   </nav>
   <a href="https://wa.me/5562981658049?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20falar%20sobre%20o%20meu%20caso." target="_blank" rel="noopener" class="btn btn-solid btn-header">Falar com o escritório</a>
+  <button class="menu-btn" aria-label="Abrir menu" aria-expanded="false"><span></span><span></span></button>
 </header>
+<div class="menu-mobile" hidden>
+  <a href="index.html">Início</a>
+  <a href="quem-somos.html">Quem somos</a>
+  <a href="areas-de-atuacao.html">Áreas de atuação</a>
+  <a href="blog/">Blog</a>
+  <a href="contato.html">Contato</a>
+  <a class="btn btn-solid" href="https://wa.me/5562981658049?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20falar%20sobre%20o%20meu%20caso." target="_blank" rel="noopener">Falar com o escritório</a>
+</div>
 
 <main>
 
@@ -256,7 +266,10 @@
         <li class="reveal"><span>Especialização</span>Direito e Processo Tributário, Universidade Candido Mendes (RJ)</li>
         <li class="reveal"><span>Inscrições</span>OAB/GO 34.362 · OAB/DF 73.129-A · OAB/MG 173.566-A · OAB/SP 482.305-A</li>
       </ul>
-      <a href="https://wa.me/5562981658049?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20falar%20com%20o%20escrit%C3%B3rio." target="_blank" rel="noopener" class="btn btn-solid reveal">Falar com o escritório</a>
+      <div class="hen-ctas reveal">
+        <a href="https://wa.me/5562981658049?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20falar%20com%20o%20escrit%C3%B3rio." target="_blank" rel="noopener" class="btn btn-solid">Falar com o escritório</a>
+        <a href="quem-somos.html" class="btn btn-ghost">Conhecer a equipe</a>
+      </div>
     </div>
   </div>
 </section>
@@ -317,6 +330,42 @@
   </div>
 </section>
 
+<!-- ---------- blog: 3 artigos (gerados por _gerar_paginas.py) ---------- -->
+<section id="blog-home">
+  <div class="section-head blog-head">
+    <div>
+      <p class="kicker reveal">Blog</p>
+      <h2 class="split">Fique por dentro dos <em>seus direitos</em></h2>
+    </div>
+    <a href="blog/" class="btn btn-ghost reveal">Ver todos os conteúdos</a>
+  </div>
+  <div class="post-grid">
+    <!--BLOG-HOME-->
+    <a class="post-card reveal" href="blog/bpc-loas.html">
+      <div class="post-img"><img src="assets/img/blog/bpc-loas.jpg" alt="" loading="lazy" width="900" height="733"></div>
+      <span class="post-tag">Benefícios do INSS</span>
+      <h3>BPC/LOAS</h3>
+      <p>O Benefício de Prestação Continuada (BPC), também conhecido como Lei Orgânica da Assistência Social (LOAS), é um importante instrumento de proteção…</p>
+      <span class="area-cta">Ler artigo <b>→</b></span>
+    </a>
+    <a class="post-card reveal" href="blog/auxilio-acidente.html">
+      <div class="post-img"><img src="assets/img/blog/auxilio-acidente.jpg" alt="" loading="lazy" width="900" height="733"></div>
+      <span class="post-tag">Benefícios do INSS</span>
+      <h3>Auxílio-Acidente: seu direito ao amparo pós-acidente</h3>
+      <p>O auxílio-acidente é um benefício previdenciário essencial para quem enfrentou um acidente e sofreu sequelas que impactam sua capacidade de trabalho.…</p>
+      <span class="area-cta">Ler artigo <b>→</b></span>
+    </a>
+    <a class="post-card reveal" href="blog/auxilio-doenca.html">
+      <div class="post-img"><img src="assets/img/blog/auxilio-doenca.jpg" alt="" loading="lazy" width="900" height="733"></div>
+      <span class="post-tag">Benefícios do INSS</span>
+      <h3>Auxílio-Doença</h3>
+      <p>O auxílio-doença é um benefício concedido pelo INSS para trabalhadores que, por motivos de saúde, encontram-se temporariamente incapazes de…</p>
+      <span class="area-cta">Ler artigo <b>→</b></span>
+    </a>
+    <!--/BLOG-HOME-->
+  </div>
+</section>
+
 <!-- ---------- FAQ ---------- -->
 <section id="faq">
   <div class="faq-wrap">
@@ -367,11 +416,17 @@
   <div class="foot-top">
     <img src="assets/img/logo-dourado.svg" alt="Stabille Advogados" width="220" height="59" loading="lazy">
     <nav>
-      <a href="#atuacao">Atuação</a>
-      <a href="#escritorio">O escritório</a>
-      <a href="#henrique">Quem atende</a>
-      <a href="#faq">Dúvidas</a>
+      <a href="quem-somos.html">Quem somos</a>
+      <a href="areas-de-atuacao.html">Áreas de atuação</a>
+      <a href="blog/">Blog</a>
+      <a href="contato.html">Contato</a>
     </nav>
+  </div>
+  <div class="foot-cols">
+    <div><span>Endereço</span>Rua 14, Ed. Flamboyant Park Business, salas 2602 a 2607<br>Jardim Goiás, Goiânia (GO) · 74810-180</div>
+    <div><span>Telefone</span><a href="tel:+556230100113">(62) 3010-0113</a></div>
+    <div><span>WhatsApp</span><a href="https://wa.me/5562981658049" target="_blank" rel="noopener">(62) 9 8165-8049</a></div>
+    <div><span>Horário</span>Segunda a sexta, 9h às 18h</div>
   </div>
   <div class="foot-bottom">
     <span>© <span id="year">2026</span> Stabille Advogados · Henrique Stabile · OAB/GO 34.362</span>

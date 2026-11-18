@@ -138,8 +138,89 @@ function montarSequencia() {
     .to('.hero-quote', { opacity: 0, y: -30, duration: 0.12 }, 0.88);
 }
 
-iniciarHero();
-mqMobile.addEventListener('change', iniciarHero);
+if (heroCanvas) {                       /* só a home tem o filme do topo */
+  iniciarHero();
+  mqMobile.addEventListener('change', iniciarHero);
+}
+
+/* ---------- menu do celular ---------- */
+const menuBtn = document.querySelector('.menu-btn');
+const menuMobile = document.querySelector('.menu-mobile');
+if (menuBtn && menuMobile) {
+  const abrir = (sim) => {
+    menuBtn.setAttribute('aria-expanded', sim);
+    menuBtn.setAttribute('aria-label', sim ? 'Fechar menu' : 'Abrir menu');
+    menuMobile.hidden = !sim;
+    document.body.classList.toggle('menu-aberto', sim);
+    if (lenis) sim ? lenis.stop() : lenis.start();
+    if (sim && !reducedMotion) gsap.from(menuMobile.children, { opacity: 0, y: 24, duration: .6, stagger: .06, ease: 'power3.out' });
+  };
+  menuBtn.addEventListener('click', () => abrir(menuMobile.hidden));
+  menuMobile.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => abrir(false)));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !menuMobile.hidden) abrir(false); });
+}
+
+/* ---------- páginas internas: parallax das imagens ---------- */
+if (!reducedMotion) {
+  document.querySelectorAll('.ph-img img').forEach((img) => {
+    gsap.fromTo(img, { yPercent: -8 }, { yPercent: 6, ease: 'none',
+      scrollTrigger: { trigger: img.closest('section'), start: 'top top', end: 'bottom top', scrub: true } });
+  });
+  document.querySelectorAll('.area-img img').forEach((img) => {
+    gsap.fromTo(img, { yPercent: -12 }, { yPercent: 0, ease: 'none',
+      scrollTrigger: { trigger: img.parentElement, start: 'top bottom', end: 'bottom top', scrub: true } });
+  });
+}
+
+/* ---------- formulário Fale conosco ----------
+   CONFIG_FORM.endpoint fica vazio até existir a área administrativa do site.
+   Com endpoint: envia JSON por POST. Sem endpoint: abre o WhatsApp do escritório já com a mensagem
+   preenchida, pra nenhum contato se perder enquanto isso. */
+const CONFIG_FORM = { endpoint: '', whatsapp: '5562981658049' };
+const form = document.getElementById('fale-conosco');
+if (form) {
+  const status = form.querySelector('.form-status');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (form.empresa.value) return;                         /* campo isca: robô preencheu */
+    let ok = true;
+    form.querySelectorAll('[required]').forEach((el) => {
+      const vazio = el.type === 'checkbox' ? !el.checked : !el.value.trim();
+      const alvo = el.type === 'checkbox' ? el.closest('.aceite') : el;
+      alvo.classList.toggle('erro', vazio);
+      if (vazio) ok = false;
+    });
+    const tel = form.telefone.value.replace(/\D/g, '');
+    if (tel && (tel.length < 10 || tel.length > 13)) { form.telefone.classList.add('erro'); ok = false; }
+    if (!ok) { status.textContent = 'Preencha os campos destacados para enviar.'; return; }
+
+    const dados = {
+      nome: form.nome.value.trim(), telefone: form.telefone.value.trim(), email: form.email.value.trim(),
+      assunto: form.assunto.value, mensagem: form.mensagem.value.trim(),
+      origem: location.href, enviado_em: new Date().toISOString()
+    };
+    const botao = form.querySelector('button[type=submit]');
+    botao.disabled = true;
+    if (CONFIG_FORM.endpoint) {
+      try {
+        const r = await fetch(CONFIG_FORM.endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dados) });
+        if (!r.ok) throw new Error(r.status);
+        form.reset();
+        status.textContent = 'Mensagem enviada. A equipe do escritório vai falar com você em breve.';
+      } catch (err) {
+        status.textContent = 'Não foi possível enviar agora. Tente pelo WhatsApp, logo abaixo.';
+      }
+    } else {
+      const texto = `Olá! Vim pelo site (Fale conosco).\nNome: ${dados.nome}\nWhatsApp: ${dados.telefone}` +
+        (dados.email ? `\nE-mail: ${dados.email}` : '') + `\nAssunto: ${dados.assunto}\nMensagem: ${dados.mensagem}`;
+      window.open(`https://wa.me/${CONFIG_FORM.whatsapp}?text=${encodeURIComponent(texto)}`, '_blank', 'noopener');
+      status.textContent = 'Abrimos o WhatsApp do escritório com a sua mensagem pronta. É só tocar em enviar.';
+    }
+    botao.disabled = false;
+  });
+  form.querySelectorAll('input, select, textarea').forEach((el) =>
+    el.addEventListener('input', () => { el.classList.remove('erro'); el.closest('.aceite')?.classList.remove('erro'); }));
+}
 
 /* ---------- entrada do hero ---------- */
 const heroIntro = gsap.timeline({ paused: true });
@@ -211,6 +292,7 @@ const mm = gsap.matchMedia();
 mm.add('(prefers-reduced-motion: no-preference)', () => {
   const pin = document.querySelector('.esc-pin');
   const track = document.querySelector('.esc-track');
+  if (!pin || !track) return;
   const dist = () => track.getBoundingClientRect().right - window.innerWidth + parseFloat(getComputedStyle(pin).paddingRight);
   const tl = gsap.timeline({
     scrollTrigger: { trigger: '#escritorio', start: 'top top', end: () => '+=' + dist() * 1.1, pin: true, scrub: 0.8, invalidateOnRefresh: true, anticipatePin: 1 }
@@ -232,7 +314,7 @@ if (linha && !reducedMotion) {
 } else if (linha) linha.style.setProperty('--p', 1);
 
 /* ---------- foto do Henrique: leve parallax ---------- */
-if (!reducedMotion) {
+if (!reducedMotion && document.querySelector('#henrique')) {
   gsap.fromTo('.hen-frame img', { yPercent: -4, scale: 1.08 }, {
     yPercent: 4, scale: 1.08, ease: 'none',
     scrollTrigger: { trigger: '#henrique', start: 'top bottom', end: 'bottom top', scrub: true }
