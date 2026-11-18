@@ -1,4 +1,4 @@
-# Stabille Advogados — site (modelo 1)
+# Stabile Advogados — site (modelo 1)
 
 Site de página única, cinematográfico, feito com o método da Aula 14 do Vibehub ("Como Criar Sites Premium",
 skills `criar-site-motion` + `briefing-de-site` + `site-motion-starter`). HTML, CSS e JS puros, sem build.
@@ -50,7 +50,6 @@ As páginas internas saem de `_gerar_paginas.py` (fora do git). Para mudar texto
 - [ ] Ligar o formulário à área administrativa
 
 - [ ] Logo definitiva (a atual é provisória)
-- [ ] Grafia da marca: o site usa **Stabille Advogados** (pedido), mas o sobrenome registrado na OAB é **Stabile**
 - [ ] Confirmar o WhatsApp do escritório novo (hoje: (62) 9 8165-8049, o mesmo do S&P) e o fixo (62) 3010-0113
 - [ ] CNPJ e registro da sociedade na OAB da nova banca (o 1.290 e o CNPJ 18.665.561/0001-75 são da Stabile e Pessoa e ficaram de fora)
 - [ ] Foto do Dr. Henrique em alta resolução (a atual tem 377 px)
