@@ -1,0 +1,292 @@
+/* ============================================================
+   STABILLE ADVOGADOS — motor de animação
+   Base: site-motion-starter (Vibehub, Aula 14).
+   Lenis (scroll suave) + GSAP ScrollTrigger, um loop de rAF só.
+   ============================================================ */
+
+const CONFIG = {
+  frameCount: 120,                       /* ls assets/frames | wc -l */
+  framePath: (i) => `assets/frames/hero_${String(i).padStart(4, '0')}.jpg`,
+  heroScrollLength: '+=220%',
+  breakpointMobile: 768,
+  breakpointGallery: 960,                /* abaixo disso a galeria vira rolagem lateral nativa */
+  particleRGB: '201,164,106',
+  particleCountDesktop: 60,
+  particleCountMobile: 24
+};
+
+gsap.registerPlugin(ScrollTrigger);
+
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const mqMobile = window.matchMedia(`(max-width: ${CONFIG.breakpointMobile}px)`);
+
+/* ---------- Lenis + GSAP: um loop só ---------- */
+let lenis = null;
+if (!reducedMotion) {
+  lenis = new Lenis({ duration: 1.2, smoothWheel: true });
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add((t) => lenis.raf(t * 1000));
+  gsap.ticker.lagSmoothing(0);
+}
+
+document.querySelectorAll('a[href^="#"]').forEach((a) => {
+  a.addEventListener('click', (e) => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (!target) return;
+    e.preventDefault();
+    if (lenis) lenis.scrollTo(target, { offset: 0, duration: 1.6 });
+    else target.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+
+/* ---------- header + barra de progresso ---------- */
+const header = document.getElementById('header');
+const bar = document.querySelector('.progress span');
+ScrollTrigger.create({
+  start: 0, end: 'max',
+  onUpdate: (self) => {
+    header.classList.toggle('scrolled', self.scroll() > 80);
+    bar.style.transform = `scaleX(${self.progress})`;
+  }
+});
+
+/* ============================================================
+   HERO — a câmera se aproxima da estátua conforme o scroll
+   ============================================================ */
+const heroCanvas = document.getElementById('hero-canvas');
+const heroVideo = document.getElementById('hero-video');
+let sequenciaMontada = false;
+
+function iniciarHero() {
+  if (reducedMotion || mqMobile.matches) { tocarVideo(); return; }
+  if (sequenciaMontada) return;
+  sequenciaMontada = true;
+  montarSequencia();
+}
+
+function tocarVideo() {
+  const tentar = () => heroVideo.play().catch(() => {});
+  tentar();
+  heroVideo.addEventListener('canplay', tentar, { once: true });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) tentar(); });
+  document.addEventListener('touchstart', tentar, { once: true });
+  document.addEventListener('click', tentar, { once: true });
+}
+
+function montarSequencia() {
+  const ctx = heroCanvas.getContext('2d');
+  const imgs = [];
+  for (let i = 1; i <= CONFIG.frameCount; i++) {
+    const im = new Image();
+    im.decoding = 'async';
+    im.src = CONFIG.framePath(i);
+    if (i === 1) im.onload = sizeCanvas;
+    imgs.push(im);
+  }
+  const state = { f: 0 };
+
+  function sizeCanvas() {
+    const w = heroCanvas.clientWidth, h = heroCanvas.clientHeight;
+    if (!w || !h) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    heroCanvas.width = w * dpr;
+    heroCanvas.height = h * dpr;
+    drawFrame(state.f);
+  }
+
+  function drawFrame(index) {
+    /* se o frame pedido ainda não carregou, usa o mais próximo que já carregou */
+    let i = Math.round(index), im = imgs[i];
+    while (i > 0 && !(im && im.complete && im.naturalWidth)) im = imgs[--i];
+    if (!im || !im.naturalWidth) return;
+    const cw = heroCanvas.width, ch = heroCanvas.height;
+    const iw = im.naturalWidth, ih = im.naturalHeight;
+    const scale = Math.max(cw / iw, ch / ih);
+    const w = iw * scale, h = ih * scale;
+    /* a estátua fica um pouco à direita, longe do texto */
+    const ox = Math.min(0, (cw - w) / 2 + cw * 0.08);
+    ctx.drawImage(im, Math.max(cw - w, ox), (ch - h) / 2, w, h);
+  }
+
+  if (window.ResizeObserver) new ResizeObserver(sizeCanvas).observe(heroCanvas);
+  window.addEventListener('resize', sizeCanvas);
+  sizeCanvas();
+
+  const heroTl = gsap.timeline({
+    defaults: { ease: 'none' },
+    scrollTrigger: { trigger: '#hero', start: 'top top', end: CONFIG.heroScrollLength, scrub: 0.6, pin: true, anticipatePin: 1 }
+  });
+  heroTl
+    .to(state, { f: CONFIG.frameCount - 1, snap: 'f', duration: 1, onUpdate: () => drawFrame(state.f) }, 0)
+    .to('.scroll-hint', { opacity: 0, duration: 0.06 }, 0.02)
+    .to('.hero-content', { opacity: 0, y: -70, duration: 0.25 }, 0.3)
+    .fromTo('.hero-quote', { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.18 }, 0.5)
+    .fromTo('.hq-line', { scaleX: 0, transformOrigin: 'left' }, { scaleX: 1, duration: 0.18 }, 0.52)
+    .to('.hero-quote', { opacity: 0, y: -30, duration: 0.12 }, 0.88);
+}
+
+iniciarHero();
+mqMobile.addEventListener('change', iniciarHero);
+
+/* ---------- entrada do hero ---------- */
+const heroIntro = gsap.timeline({ paused: true });
+heroIntro.from('.reveal-hero', { opacity: 0, y: 46, duration: 1.15, stagger: 0.13, ease: 'power3.out' });
+
+const preloader = document.getElementById('preloader');
+function liberarPreloader() {
+  if (preloader.classList.contains('done')) return;
+  preloader.classList.add('done');
+  heroIntro.play();
+}
+window.addEventListener('load', () => setTimeout(liberarPreloader, 900));
+setTimeout(liberarPreloader, 3200);
+
+/* ---------- títulos: palavra por palavra, por trás de uma máscara ---------- */
+function splitWords(el) {
+  const walk = (node) => {
+    [...node.childNodes].forEach((n) => {
+      if (n.nodeType === 3) {
+        const frag = document.createDocumentFragment();
+        n.textContent.split(/(\s+)/).forEach((part) => {
+          if (!part) return;
+          if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(part)); return; }
+          const w = document.createElement('span'); w.className = 'w';
+          const inner = document.createElement('span'); inner.textContent = part;
+          w.appendChild(inner); frag.appendChild(w);
+        });
+        n.replaceWith(frag);
+      } else if (n.nodeType === 1) walk(n);
+    });
+  };
+  walk(el);
+}
+document.querySelectorAll('.split').forEach((el) => {
+  splitWords(el);
+  if (reducedMotion) return;
+  gsap.from(el.querySelectorAll('.w > span'), {
+    yPercent: 110, duration: 1.1, ease: 'power4.out', stagger: 0.045,
+    scrollTrigger: { trigger: el, start: 'top 85%' }
+  });
+});
+
+/* ---------- reveals genéricos ---------- */
+if (!reducedMotion) {
+  gsap.utils.toArray('.reveal').forEach((el) => {
+    gsap.from(el, {
+      opacity: 0, y: 50, duration: 1.05, ease: 'power3.out',
+      scrollTrigger: { trigger: el, start: 'top 86%', toggleActions: 'play none none reverse' }
+    });
+  });
+}
+
+/* ---------- números contando ---------- */
+document.querySelectorAll('.count').forEach((el) => {
+  const to = parseFloat(el.dataset.to), dec = parseInt(el.dataset.dec || '0', 10), suf = el.dataset.suffix || '';
+  const fmt = (v) => v.toFixed(dec).replace('.', ',') + suf;
+  if (reducedMotion) { el.textContent = fmt(to); return; }
+  const o = { v: 0 };
+  el.textContent = fmt(0);
+  gsap.to(o, {
+    v: to, duration: 2, ease: 'power2.out',
+    scrollTrigger: { trigger: el, start: 'top 90%' },
+    onUpdate: () => { el.textContent = fmt(o.v); }
+  });
+});
+
+/* ---------- galeria do escritório: rola na horizontal presa na tela ---------- */
+const mm = gsap.matchMedia();
+mm.add(`(min-width: ${CONFIG.breakpointGallery + 1}px) and (prefers-reduced-motion: no-preference)`, () => {
+  const pin = document.querySelector('.esc-pin');
+  const track = document.querySelector('.esc-track');
+  const dist = () => track.getBoundingClientRect().right - window.innerWidth + parseFloat(getComputedStyle(pin).paddingRight);
+  const tl = gsap.timeline({
+    scrollTrigger: { trigger: '#escritorio', start: 'top top', end: () => '+=' + dist() * 1.1, pin: true, scrub: 0.8, invalidateOnRefresh: true, anticipatePin: 1 }
+  });
+  tl.to('.esc-intro', { x: () => -dist() * 0.25, opacity: 0.25, ease: 'none' }, 0)
+    .to(track, { x: () => -dist(), ease: 'none' }, 0);
+  document.querySelectorAll('.esc-photo img').forEach((img) => {
+    tl.fromTo(img, { xPercent: -6 }, { xPercent: 6, ease: 'none' }, 0);
+  });
+});
+
+/* ---------- linha dos passos acompanha o scroll ---------- */
+const linha = document.querySelector('.passos-line');
+if (linha && !reducedMotion) {
+  ScrollTrigger.create({
+    trigger: '.passos', start: 'top 80%', end: 'bottom 60%', scrub: true,
+    onUpdate: (s) => linha.style.setProperty('--p', s.progress.toFixed(3))
+  });
+} else if (linha) linha.style.setProperty('--p', 1);
+
+/* ---------- foto do Henrique: leve parallax ---------- */
+if (!reducedMotion) {
+  gsap.fromTo('.hen-frame img', { yPercent: -4, scale: 1.08 }, {
+    yPercent: 4, scale: 1.08, ease: 'none',
+    scrollTrigger: { trigger: '#henrique', start: 'top bottom', end: 'bottom top', scrub: true }
+  });
+  gsap.from('.hen-arch', {
+    clipPath: 'inset(0 0 100% 0)', duration: 2, ease: 'power2.out',
+    scrollTrigger: { trigger: '#henrique', start: 'top 70%' }
+  });
+}
+
+/* ---------- vidro: brilho segue o mouse ---------- */
+document.querySelectorAll('.glass').forEach((card) => {
+  card.addEventListener('pointermove', (e) => {
+    const r = card.getBoundingClientRect();
+    card.style.setProperty('--mx', `${e.clientX - r.left}px`);
+    card.style.setProperty('--my', `${e.clientY - r.top}px`);
+  });
+});
+
+/* ---------- partículas: poeira dourada na luz ---------- */
+(function particles() {
+  if (reducedMotion) return;
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let W = 0, H = 0;
+  const dots = [];
+  const N = mqMobile.matches ? CONFIG.particleCountMobile : CONFIG.particleCountDesktop;
+  function resize() {
+    W = canvas.width = window.innerWidth || document.documentElement.clientWidth;
+    H = canvas.height = window.innerHeight || document.documentElement.clientHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+  for (let i = 0; i < N; i++) {
+    dots.push({ x: Math.random(), y: Math.random(), r: Math.random() * 1.5 + 0.4,
+      vx: (Math.random() - 0.5) * 0.1, vy: -(Math.random() * 0.16 + 0.04),
+      a: Math.random() * 0.32 + 0.08, tw: Math.random() * Math.PI * 2 });
+  }
+  let posicionado = false;
+  function tick() {
+    if (!W) resize();
+    if (!posicionado && W) { posicionado = true; dots.forEach((d) => { d.x *= W; d.y *= H; }); }
+    ctx.clearRect(0, 0, W, H);
+    for (const d of dots) {
+      d.x += d.vx; d.y += d.vy; d.tw += 0.02;
+      if (d.y < -10) { d.y = H + 10; d.x = Math.random() * W; }
+      if (d.x < -10) d.x = W + 10;
+      if (d.x > W + 10) d.x = -10;
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${CONFIG.particleRGB},${d.a * (0.65 + 0.35 * Math.sin(d.tw))})`;
+      ctx.fill();
+    }
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
+
+/* ---------- FAQ: abrir um fecha os outros ---------- */
+const faqItems = document.querySelectorAll('.faq-item');
+faqItems.forEach((item) => {
+  item.addEventListener('toggle', () => {
+    if (item.open) faqItems.forEach((o) => { if (o !== item) o.open = false; });
+    ScrollTrigger.refresh();
+  });
+});
+
+document.getElementById('year').textContent = new Date().getFullYear();
+window.addEventListener('load', () => ScrollTrigger.refresh());
+document.fonts && document.fonts.ready.then(() => ScrollTrigger.refresh());
