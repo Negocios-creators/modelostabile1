@@ -5,8 +5,9 @@
    ============================================================ */
 
 const CONFIG = {
-  frameCount: 120,                       /* ls assets/frames | wc -l */
-  framePath: (i) => `assets/frames/hero_${String(i).padStart(4, '0')}.jpg`,
+  frameCount: 120,                       /* ls assets/frames | wc -l (frames-m tem o mesmo número) */
+  /* celular usa frames-m: recorte vertical mais leve, com a mesma animação do computador */
+  framePath: (i, mobile) => `assets/${mobile ? 'frames-m' : 'frames'}/hero_${String(i).padStart(4, '0')}.jpg`,
   heroScrollLength: '+=220%',
   breakpointMobile: 768,
   breakpointGallery: 960,                /* abaixo disso a galeria vira rolagem lateral nativa */
@@ -57,8 +58,12 @@ const heroCanvas = document.getElementById('hero-canvas');
 const heroVideo = document.getElementById('hero-video');
 let sequenciaMontada = false;
 
+/* a barra de endereço do celular aparece/some no scroll: não recalcular tudo por isso */
+ScrollTrigger.config({ ignoreMobileResize: true });
+
 function iniciarHero() {
-  if (reducedMotion || mqMobile.matches) { tocarVideo(); return; }
+  /* só quem pediu menos movimento fica com o vídeo; celular e computador têm o filme no scroll */
+  if (reducedMotion) { document.documentElement.classList.add('rm'); tocarVideo(); return; }
   if (sequenciaMontada) return;
   sequenciaMontada = true;
   montarSequencia();
@@ -76,10 +81,11 @@ function tocarVideo() {
 function montarSequencia() {
   const ctx = heroCanvas.getContext('2d');
   const imgs = [];
+  const mobile = mqMobile.matches;
   for (let i = 1; i <= CONFIG.frameCount; i++) {
     const im = new Image();
     im.decoding = 'async';
-    im.src = CONFIG.framePath(i);
+    im.src = CONFIG.framePath(i, mobile);
     if (i === 1) im.onload = sizeCanvas;
     imgs.push(im);
   }
@@ -103,9 +109,16 @@ function montarSequencia() {
     const iw = im.naturalWidth, ih = im.naturalHeight;
     const scale = Math.max(cw / iw, ch / ih);
     const w = iw * scale, h = ih * scale;
-    /* a estátua fica um pouco à direita, longe do texto */
-    const ox = Math.min(0, (cw - w) / 2 + cw * 0.08);
-    ctx.drawImage(im, Math.max(cw - w, ox), (ch - h) / 2, w, h);
+    let ox;
+    if (mobile) {
+      /* tela em pé: a "câmera" acompanha a estátua, que anda da esquerda pro centro do recorte */
+      const fx = 0.36 + 0.2 * (index / (CONFIG.frameCount - 1));
+      ox = cw / 2 - w * fx;
+    } else {
+      /* a estátua fica um pouco à direita, longe do texto */
+      ox = (cw - w) / 2 + cw * 0.08;
+    }
+    ctx.drawImage(im, Math.max(cw - w, Math.min(0, ox)), (ch - h) / 2, w, h);
   }
 
   if (window.ResizeObserver) new ResizeObserver(sizeCanvas).observe(heroCanvas);
@@ -195,7 +208,7 @@ document.querySelectorAll('.count').forEach((el) => {
 
 /* ---------- galeria do escritório: rola na horizontal presa na tela ---------- */
 const mm = gsap.matchMedia();
-mm.add(`(min-width: ${CONFIG.breakpointGallery + 1}px) and (prefers-reduced-motion: no-preference)`, () => {
+mm.add('(prefers-reduced-motion: no-preference)', () => {
   const pin = document.querySelector('.esc-pin');
   const track = document.querySelector('.esc-track');
   const dist = () => track.getBoundingClientRect().right - window.innerWidth + parseFloat(getComputedStyle(pin).paddingRight);
