@@ -405,7 +405,7 @@ document.fonts && document.fonts.ready.then(() => ScrollTrigger.refresh());
   if (!foto || reducedMotion) return;
   const tl = gsap.timeline({
     defaults: { ease: 'none' },
-    scrollTrigger: { trigger: '#hero', start: 'top top', end: '+=110%', scrub: 0.6, pin: true, anticipatePin: 1 }
+    scrollTrigger: { trigger: '#hero', start: 'top top', end: '+=110%', scrub: 0.6, pin: true, anticipatePin: 1, refreshPriority: 10 }
   });
   tl.to(foto, { scale: 1.08, duration: 1 }, 0)
     .to('.scroll-hint', { opacity: 0, duration: 0.06 }, 0.02)
@@ -413,4 +413,7 @@ document.fonts && document.fonts.ready.then(() => ScrollTrigger.refresh());
     .fromTo('.hero-quote', { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.2 }, 0.5)
     .fromTo('.hq-line', { scaleX: 0, transformOrigin: 'left' }, { scaleX: 1, duration: 0.2 }, 0.52)
     .to('.hero-quote', { opacity: 0, y: -30, duration: 0.12 }, 0.88);
+  /* esse pin foi criado depois dos outros: reordena e recalcula, senão o escritório fixa cedo demais */
+  ScrollTrigger.sort();
+  ScrollTrigger.refresh();
 })();

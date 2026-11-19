@@ -455,7 +455,7 @@ footer { position: relative; z-index: 3; border-top: 1px solid var(--line); padd
 #prova, #situacoes, #atuacao {
   --ink: #1B1612; --muted: #6B6457; --accent: #9A7A45; --accent-hi: #7A5E30;
   --line: rgba(154, 122, 69, .22); --line-2: rgba(154, 122, 69, .4);
-  background: #FFFFFF; color: var(--ink); position: relative; z-index: 3;
+  background: #FFFFFF; color: var(--ink); position: relative;
 }
 #situacoes { background: #F5EFE6; }
 #atuacao::before { opacity: .35; }
