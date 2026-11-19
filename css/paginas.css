@@ -190,3 +190,7 @@ body.menu-aberto { overflow: hidden; }
   .missao-aspas { font-size: 100px; }
   .hen-ctas .btn { width: 100%; }
 }
+
+/* moldura reta na foto do Dr. Henrique (pedido 19/11: o arco parecia "lápide") */
+.hen-frame { border-radius: 4px !important; }
+.hen-arch { border-radius: 4px !important; }
