@@ -385,3 +385,15 @@ faqItems.forEach((item) => {
 document.getElementById('year').textContent = new Date().getFullYear();
 window.addEventListener('load', () => ScrollTrigger.refresh());
 document.fonts && document.fonts.ready.then(() => ScrollTrigger.refresh());
+
+/* blocos claros (19/11): esconde a vinheta escura enquanto eles estão na tela */
+(() => {
+  const claros = document.querySelectorAll('#prova, #situacoes, #atuacao');
+  if (!claros.length || !('IntersectionObserver' in window)) return;
+  const vis = new Set();
+  const io = new IntersectionObserver(es => {
+    es.forEach(e => e.isIntersecting ? vis.add(e.target) : vis.delete(e.target));
+    document.body.classList.toggle('no-claro', vis.size > 0);
+  }, { rootMargin: '-35% 0px -35% 0px' });
+  claros.forEach(c => io.observe(c));
+})();
