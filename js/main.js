@@ -176,7 +176,7 @@ if (!reducedMotion) {
    CONFIG_FORM.endpoint fica vazio até existir a área administrativa do site.
    Com endpoint: envia JSON por POST. Sem endpoint: abre o WhatsApp do escritório já com a mensagem
    preenchida, pra nenhum contato se perder enquanto isso. */
-const CONFIG_FORM = { endpoint: '', whatsapp: '5562981658049' };
+const CONFIG_FORM = { endpoint: '', whatsapp: '5562981618792' };
 const form = document.getElementById('fale-conosco');
 if (form) {
   const status = form.querySelector('.form-status');
