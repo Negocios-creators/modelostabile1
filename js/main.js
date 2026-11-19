@@ -397,3 +397,20 @@ document.fonts && document.fonts.ready.then(() => ScrollTrigger.refresh());
   }, { rootMargin: '-35% 0px -35% 0px' });
   claros.forEach(c => io.observe(c));
 })();
+
+/* capa com a foto do Dr. Henrique (19/11): o texto sai e a frase entra no scroll,
+   e a foto se aproxima mais um pouco (o zoom leve contínuo fica no CSS) */
+(() => {
+  const foto = document.querySelector('#hero .hero-foto');
+  if (!foto || reducedMotion) return;
+  const tl = gsap.timeline({
+    defaults: { ease: 'none' },
+    scrollTrigger: { trigger: '#hero', start: 'top top', end: '+=110%', scrub: 0.6, pin: true, anticipatePin: 1 }
+  });
+  tl.to(foto, { scale: 1.08, duration: 1 }, 0)
+    .to('.scroll-hint', { opacity: 0, duration: 0.06 }, 0.02)
+    .to('.hero-content', { opacity: 0, y: -70, duration: 0.3 }, 0.25)
+    .fromTo('.hero-quote', { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.2 }, 0.5)
+    .fromTo('.hq-line', { scaleX: 0, transformOrigin: 'left' }, { scaleX: 1, duration: 0.2 }, 0.52)
+    .to('.hero-quote', { opacity: 0, y: -30, duration: 0.12 }, 0.88);
+})();
